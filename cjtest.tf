@@ -6,7 +6,9 @@ terraform {
 
     container_name = "#{Az-ContainerName}"
 
-    key = "#{Az-BlobStoreKey}"
+    key = "oct.terraform.tfstate"
+
+    access_key = "#{Az-BlobStoreKey}"
   }
 }
 
