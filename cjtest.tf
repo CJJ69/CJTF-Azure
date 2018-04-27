@@ -103,9 +103,12 @@ resource "azurerm_network_security_group" "publicipnsg" {
 }
 
 resource "azurerm_network_interface" "nic" {
+  name = "${var.vm_name}-nic"
+
   //  count               = 2
-  name                = "${var.vm_name}${count.index}-nic"
-  location            = "${azurerm_resource_group.rg.location}"
+  //  name                = "${var.vm_name}${count.index}-nic"
+  location = "${azurerm_resource_group.rg.location}"
+
   resource_group_name = "${azurerm_resource_group.rg.name}"
 
   ip_configuration {
