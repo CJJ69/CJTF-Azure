@@ -13,11 +13,11 @@ terraform {
 }
 
 variable "name_prefix" {
-  default = "CJTF"
+  default = "#{NamePrefix}"
 }
 
 variable "vm_name" {
-  default = "${var.name_prefix}#{VMName}"
+  default = "#{NamePrefix}#{VMName}"
 }
 
 provider "random" {
@@ -78,4 +78,8 @@ resource "azurerm_public_ip" "publicip" {
   tags {
     environment = "#{Octopus.Environment.Name}"
   }
+}
+
+output "ip" {
+  value = "${azurerm_public_ip.publicip.public_ip}"
 }
