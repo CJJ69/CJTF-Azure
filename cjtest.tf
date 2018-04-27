@@ -81,5 +81,5 @@ resource "azurerm_public_ip" "publicip" {
 }
 
 output "ip" {
-  value = "${azurerm_public_ip.publicip.public_ip}"
+  value = "${azurerm_public_ip.publicip.fqdn}"
 }
