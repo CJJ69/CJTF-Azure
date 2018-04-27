@@ -103,10 +103,8 @@ resource "azurerm_network_security_group" "publicipnsg" {
 }
 
 resource "azurerm_network_interface" "nic" {
-  name = "${var.vm_name}-nic"
-
-  //  count               = 2
-  //  name                = "${var.vm_name}${count.index}-nic"
+  count    = 1
+  name     = "${var.vm_name}${count.index}-nic"
   location = "${azurerm_resource_group.rg.location}"
 
   resource_group_name = "${azurerm_resource_group.rg.name}"
@@ -123,5 +121,46 @@ resource "azurerm_network_interface" "nic" {
 
   tags {
     environment = "#{Octopus.Environment.Name}"
+  }
+}
+
+resource "azurerm_virtual_machine" "vm" {
+  count                 = 1
+  name                  = "${var.vm_name}${count.index}"
+  location              = "${azurerm_resource_group.rg.location}"
+  resource_group_name   = "${azurerm_resource_group.rg.name}"
+  network_interface_ids = ["${element(azurerm_network_interface.nic.*.id, count.index)}"]
+  vm_size               = "Standard_D1_v2"
+
+  storage_os_disk {
+    name              = "${var.vm_name}${count.index}-osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"                        #"Premium_LRS"
+  }
+
+  storage_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+
+  os_profile {
+    computer_name  = "${var.vm_name}"
+    admin_username = "${var.admin_username}"
+    admin_password = "${var.admin_password}"
+  }
+
+  os_profile_windows_config {
+    provision_vm_agent        = true
+    enable_automatic_upgrades = false
+
+    additional_unattend_config {
+      pass         = "oobeSystem"
+      component    = "Microsoft-Windows-Shell-Setup"
+      setting_name = "AutoLogon"
+      content      = "<AutoLogon><Password><Value>${var.admin_password}</Value></Password><Enabled>true</Enabled><LogonCount>1</LogonCount><Username>${var.admin_username}</Username></AutoLogon>"
+    }
   }
 }
