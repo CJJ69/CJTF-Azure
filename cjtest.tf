@@ -80,6 +80,45 @@ resource "azurerm_public_ip" "publicip" {
   }
 }
 
-output "ip" {
-  value = "${azurerm_public_ip.publicip.fqdn}"
+resource "azurerm_network_security_group" "publicipnsg" {
+  name                = "${var.name_prefix}-nsg"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+  security_rule {
+    name                       = "OctopusTentacle"
+    priority                   = 1002
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "10933"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  tags {
+    environment = "#{Octopus.Environment.Name}"
+  }
+}
+
+resource "azurerm_network_interface" "nic" {
+  //  count               = 2
+  name                = "${var.vm_name}${count.index}-nic"
+  location            = "${azurerm_resource_group.rg.location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+
+  ip_configuration {
+    name                          = "${var.vm_name}-ipconfig"
+    subnet_id                     = "${azurerm_subnet.subnet.id}"
+    private_ip_address_allocation = "dynamic"
+
+    //    load_balancer_backend_address_pools_ids = ["${azurerm_lb_backend_address_pool.backendaddresspool.id}"]
+
+    public_ip_address_id = "${azurerm_public_ip.publicip.id}"
+  }
+
+  tags {
+    environment = "#{Octopus.Environment.Name}"
+  }
 }
