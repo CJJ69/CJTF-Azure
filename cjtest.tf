@@ -77,7 +77,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefix       = "10.0.2.0/24"
 }
 
-// Public IP
+# Public IP
 resource "azurerm_public_ip" "publicip" {
   name                         = "${var.name_prefix}-publicip"
   location                     = "${azurerm_resource_group.rg.location}"
@@ -89,7 +89,7 @@ resource "azurerm_public_ip" "publicip" {
   }
 }
 
-// Load Balancer
+# Load Balancer
 resource "azurerm_lb" "loadbalancer" {
   name                = "${var.name_prefix}-loadbalancer"
   location            = "${azurerm_resource_group.rg.location}"
@@ -115,7 +115,7 @@ resource "azurerm_lb_backend_address_pool" "backendaddresspool" {
   }
 }
 
-// Network Security Group
+# Network Security Group
 resource "azurerm_network_security_group" "publicipnsg" {
   name                = "${var.name_prefix}-nsg"
   location            = "${azurerm_resource_group.rg.location}"
@@ -138,7 +138,7 @@ resource "azurerm_network_security_group" "publicipnsg" {
   }
 }
 
-// Availability Set
+# Availability Set
 resource "azurerm_availability_set" "avset" {
   name                         = "avset"
   location                     = "${azurerm_resource_group.rg.location}"
@@ -148,7 +148,7 @@ resource "azurerm_availability_set" "avset" {
   managed                      = true
 }
 
-// Network Interface for VMs
+# Network Interface for VMs
 resource "azurerm_network_interface" "nic" {
   count    = "${var.vm_count}"
   name     = "${var.vm_name}${count.index}-nic"
@@ -162,7 +162,7 @@ resource "azurerm_network_interface" "nic" {
     private_ip_address_allocation           = "dynamic"
     load_balancer_backend_address_pools_ids = ["${azurerm_lb_backend_address_pool.backendaddresspool.id}"]
 
-    //   public_ip_address_id = "${azurerm_public_ip.publicip.id}"
+    #   public_ip_address_id = "${azurerm_public_ip.publicip.id}"
   }
 
   tags {
@@ -180,7 +180,7 @@ resource "azurerm_managed_disk" "disk" {
   disk_size_gb         = "${var.datadisk_size_gb}"
 }
 
-// Virtual Machines
+# Virtual Machines
 resource "azurerm_virtual_machine" "vm" {
   count                 = "${var.vm_count}"
   name                  = "${var.vm_name}${count.index}"
@@ -234,7 +234,7 @@ resource "azurerm_virtual_machine" "vm" {
   }
 }
 
-// diagnostics storage account - Standard Locally Redundant Storage (LRS)
+# diagnostics storage account - Standard Locally Redundant Storage (LRS)
 resource "azurerm_storage_account" "storageaccount" {
   name                     = "${lower(var.name_prefix)}diag${random_id.randomId.hex}"
   resource_group_name      = "${azurerm_resource_group.rg.name}"
