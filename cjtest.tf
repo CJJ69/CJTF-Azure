@@ -109,10 +109,6 @@ resource "azurerm_lb_backend_address_pool" "backendaddresspool" {
   name                = "${var.name_prefix}-BackEndAddressPool"
   resource_group_name = "${azurerm_resource_group.rg.name}"
   loadbalancer_id     = "${azurerm_lb.loadbalancer.id}"
-
-  tags {
-    environment = "#{Octopus.Environment.Name}"
-  }
 }
 
 # Network Security Group
