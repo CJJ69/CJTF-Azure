@@ -208,7 +208,7 @@ resource "azurerm_virtual_machine" "vm" {
     managed_disk_id = "${element(azurerm_managed_disk.disk.*.id, count.index)}"
     create_option   = "Attach"
     lun             = 1
-    disk_size_gb    = "${element(azurerm_managed_disk.test.*.disk_size_gb, count.index)}"
+    disk_size_gb    = "${element(azurerm_managed_disk.disk.*.disk_size_gb, count.index)}"
   }
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
